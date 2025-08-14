@@ -1,0 +1,82 @@
+import React, { useEffect } from "react";
+import confetti from "canvas-confetti";
+function Congratulation() {
+  var duration = 5 * 1000;
+  var animationEnd = Date.now() + duration;
+  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  var interval = setInterval(function () {
+    var timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+    var particleCount = 50 * (timeLeft / duration);
+    // since particles fall down, start a bit higher than random
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+    });
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+    });
+  }, 250);
+}
+
+function Welcome({ choice, onChange }) {
+  // const span_style = {
+  //   background: "pink",
+  //   padding: "10px",
+  //   borderRadius: "10px",
+  // };
+  useEffect(() => {
+    const func = async () => {
+      const script = document.createElement("script");
+      script.src =
+        "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+      script.async = true;
+      document.body.appendChild(script);
+    };
+    func();
+  }, []);
+  // const handlecongrates = () => {
+  //   Congratulation();
+  // };
+
+  return (
+    <>
+      <h2 className="text-left text-2xl">Choose your Category</h2>
+      <div className="flex justify-between font-bold">
+        {["Chicken", "Beef", "Lamb", "Vegetarian"].map((ch) => (
+          <label
+            className={`flex items-center my-2 mx-0 cursor-pointer uppercase tracking-wide
+              ${
+                choice === ch
+                  ? "font-bold text-pink-200"
+                  : "font-black text-[#213547]"
+              }
+              `}
+            key={ch}
+          >
+            <input
+              type="radio"
+              name="mealType"
+              value={ch}
+              checked={choice === ch}
+              onChange={(e) => onChange(e.target.value)} // Update the choice state
+              className="mr-[10px] w-[18px] h-[18px] cursor-pointer accent-[#1d1d1e]"
+            />
+            {ch}
+          </label>
+        ))}
+      </div>
+    </>
+  );
+}
+
+export default Welcome;

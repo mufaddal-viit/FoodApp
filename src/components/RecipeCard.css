@@ -1,0 +1,30 @@
+.recipe-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: transform 0.2s, box-shadow 0.2s, border 0.2s;
+}
+
+.recipe-card:hover {
+  border: 1px solid pink;
+  box-shadow: 0 0 15px 10px rgb(65,105,225, 0.6); /* pink glow */
+  transform: translateY(-4px); /* optional lift on hover */
+}
+
+  
+  .recipe-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .recipe-content {
+    padding: 16px;
+    flex: 1;
+  }
+  

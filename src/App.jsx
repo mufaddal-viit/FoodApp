@@ -1,0 +1,43 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router";
+import RecipeDetail from "./components/RecipeDetail.jsx";
+import Home from "./components/Home.jsx";
+import Layout from "./Layout";
+import "./App.css";
+import { useState } from "react";
+import RecipesByCategoryWrapper from "./components/RecipesByCategoryWrapper.jsx";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
+import SearchIngridents from "./components/SearchIngridents.jsx";
+
+function App() {
+  const [selectedCategory, setSelectedCategory] = useState("");
+
+  const handleCategory = (category) => {
+    setSelectedCategory(category);
+  };
+  return (
+    <Router>
+      <Header choice={selectedCategory} onChangez={handleCategory} />
+
+      <div style={{ display: "flex", minHeight: "80vh" }}>
+        {/* Sidebar */}
+        <div>
+          <SearchIngridents />
+        </div>
+
+        {/* Main content */}
+        <div style={{ flex: 1, padding: "1rem" }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="recipe/:mealid" element={<RecipeDetail />} />
+            <Route path="/:backtopage" element={<RecipesByCategoryWrapper />} />
+          </Routes>
+        </div>
+      </div>
+
+      <Footer onchangecat={handleCategory} />
+    </Router>
+  );
+}
+
+export default App;

@@ -1,0 +1,13 @@
+.link-hover {
+  font-size: larger;
+  font-weight: 800;
+  color: #213547;
+  letter-spacing: 1px;
+  transition: transform 0.2s, box-shadow 0.2s, border 0.2s, color 0.2s;
+}
+
+.link-hover:hover {
+  transform: translateY(-4px); 
+  color: white;
+  cursor: pointer;
+}
