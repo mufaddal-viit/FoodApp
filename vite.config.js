@@ -4,6 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/FoodApp/", // 👈 Add this line
+  base: "/FoodApp/",
   plugins: [react(), tailwindcss()],
 });

@@ -8,6 +8,7 @@ import RecipesByCategoryWrapper from "./components/RecipesByCategoryWrapper.jsx"
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import SearchIngridents from "./components/SearchIngridents.jsx";
+import { RecipesProvider } from "./Context/RecipeContext";
 
 function App() {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -15,28 +16,33 @@ function App() {
   const handleCategory = (category) => {
     setSelectedCategory(category);
   };
+
   return (
-    <Router>
-      <Header choice={selectedCategory} onChangez={handleCategory} />
+    <RecipesProvider>
+      <Router basename="/FoodApp">
+        {" "}
+        {/* ✅ Add basename here */}
+        <Header choice={selectedCategory} onChangez={handleCategory} />
+        <div style={{ display: "flex", minHeight: "80vh" }}>
+          <div>
+            <SearchIngridents />
+          </div>
 
-      <div style={{ display: "flex", minHeight: "80vh" }}>
-        {/* Sidebar */}
-        <div>
-          <SearchIngridents />
+          <div style={{ flex: 1, padding: "1rem" }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="recipe/:mealid" element={<RecipeDetail />} />
+              <Route
+                path="/:backtopage"
+                element={<RecipesByCategoryWrapper />}
+              />
+            </Routes>
+          </div>
         </div>
-
-        {/* Main content */}
-        <div style={{ flex: 1, padding: "1rem" }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="recipe/:mealid" element={<RecipeDetail />} />
-            <Route path="/:backtopage" element={<RecipesByCategoryWrapper />} />
-          </Routes>
-        </div>
-      </div>
-
-      <Footer onchangecat={handleCategory} />
-    </Router>
+        <Footer onchangecat={handleCategory} />
+      </Router>
+    </RecipesProvider>
   );
 }
+
 export default App;

@@ -22,13 +22,14 @@ function Home() {
   //scroll to top
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
-  });
+  }, []);
 
   // Change GIF when category changes
   useEffect(() => {
-    setRandomGifIndex(Math.floor(Math.random() * gifs.length));
-  }, []); // Depend on category to change GIF on category change
-
+    if (loading) {
+      setRandomGifIndex(Math.floor(Math.random() * gifs.length));
+    }
+  }, [loading]);
   useEffect(() => {
     const allowedCategories = ["Chicken", "Beef", "Lamb", "Vegetarian"];
     let isCancelled = false;
@@ -37,8 +38,8 @@ function Home() {
 
     const fetchRecipes = async () => {
       setLoading(true);
-      while (!isCancelled && recipes.length < 10) {
-        try {
+      try {
+        while (!isCancelled && recipes.length < 10) {
           const response = await fetch(
             "https://www.themealdb.com/api/json/v1/1/random.php"
           );
@@ -49,18 +50,16 @@ function Home() {
             setRecipes((prev) => {
               const isDuplicate = prev.some((r) => r.idMeal === meal.idMeal);
               if (!isDuplicate && prev.length < 10) {
-                return [...prev, meal]; // Incrementally update
+                return [...prev, meal];
               }
               return prev;
             });
           }
-        } catch (err) {
-          if (!isCancelled) setError(err.message || "Something went wrong");
-          break;
-        } finally {
-          // clearTimeout(timeout);
-          setLoading(false);
         }
+      } catch (err) {
+        if (!isCancelled) setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false); // ✅ Here, once after all loops or error
       }
     };
 
@@ -73,13 +72,13 @@ function Home() {
   }, []);
 
   return (
-    <div className="home-container">
+    <div className=" flex gap-2 m-1 ">
       {/* <div className="sidebar">
         <SearchIngridents />
       </div> */}
-      <div className="main-content">
+      <div className="flex flex-col flex-1">
         {loading && (
-          <div className="spinner-container">
+          <div className="spinner-container flex flex-col items-center mx-[10px]">
             {randomGifIndex !== null && (
               <img
                 className="spinner-gif"
@@ -91,7 +90,7 @@ function Home() {
           </div>
         )}
         {error && <p>Error: {error}</p>}
-        <div className="recipe-grid">
+        <div className="recipe-grid ">
           {recipes.map((recipe) => (
             <RecipeCard key={recipe.idMeal} recipe={recipe} />
           ))}
