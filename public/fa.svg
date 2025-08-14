@@ -1,8 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="256" height="128" viewBox="0 0 256 128" role="img" aria-labelledby="title">
-  <title id="title">FA Monogram</title>
-  <rect width="100%" height="100%" fill="white"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle"
-        font-family="Inter, Arial, Helvetica, sans-serif" font-size="84" font-weight="800" fill="#111">
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="48" font-weight="bold" fill="black">
     FA
   </text>
 </svg>
