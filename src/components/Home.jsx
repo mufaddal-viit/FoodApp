@@ -29,7 +29,7 @@ function Home() {
     if (loading) {
       setRandomGifIndex(Math.floor(Math.random() * gifs.length));
     }
-  }, [loading]);
+  });
   useEffect(() => {
     const allowedCategories = ["Chicken", "Beef", "Lamb", "Vegetarian"];
     let isCancelled = false;
