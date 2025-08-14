@@ -26,10 +26,8 @@ function Home() {
 
   // Change GIF when category changes
   useEffect(() => {
-    if (loading) {
-      setRandomGifIndex(Math.floor(Math.random() * gifs.length));
-    }
-  }, []);
+    setRandomGifIndex(Math.floor(Math.random() * gifs.length));
+  }, []); // Depend on category to change GIF on category change
   useEffect(() => {
     const allowedCategories = ["Chicken", "Beef", "Lamb", "Vegetarian"];
     let isCancelled = false;
