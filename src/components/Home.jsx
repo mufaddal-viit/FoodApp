@@ -56,8 +56,10 @@ function Home() {
         }
       } catch (err) {
         if (!isCancelled) setError(err.message || "Something went wrong");
+        //  break;
       } finally {
-        setLoading(false); // ✅ Here, once after all loops or error
+        // clearTimeout(timeout);
+        setLoading(false);
       }
     };
 
