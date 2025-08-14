@@ -36,6 +36,7 @@ function Home() {
 
     const fetchRecipes = async () => {
       setLoading(true);
+      let firstRecipeAdded = false;
       try {
         while (!isCancelled && recipes.length < 10) {
           const response = await fetch(
@@ -48,6 +49,10 @@ function Home() {
             setRecipes((prev) => {
               const isDuplicate = prev.some((r) => r.idMeal === meal.idMeal);
               if (!isDuplicate && prev.length < 10) {
+                if (!firstRecipeAdded) {
+                  setLoading(false); // ✅ turn off loading after 1st recipe
+                  firstRecipeAdded = true;
+                }
                 return [...prev, meal];
               }
               return prev;
@@ -56,10 +61,7 @@ function Home() {
         }
       } catch (err) {
         if (!isCancelled) setError(err.message || "Something went wrong");
-        //  break;
-      } finally {
-        // clearTimeout(timeout);
-        setLoading(false);
+        setLoading(false); // make sure we hide loading even on error
       }
     };
 
