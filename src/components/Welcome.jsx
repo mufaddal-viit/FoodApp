@@ -50,7 +50,7 @@ function Welcome({ choice, onChange }) {
 
   return (
     <section>
-      <h2 className="text-left text-2xl sm:text-3xl font-semibold mt-2 text-[#213547]">
+      <h2 className="text-left text-2xl  sm:text-3xl font-semibold mt-2 text-[#213547]">
         Choose your Category
       </h2>
 
