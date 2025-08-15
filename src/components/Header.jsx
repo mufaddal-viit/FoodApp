@@ -79,20 +79,25 @@ import { useNavigate } from "react-router";
 import confetti from "canvas-confetti";
 
 function Congratulation() {
-  var duration = 5 * 1000;
-  var animationEnd = Date.now() + duration;
-  var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+  const duration = 5 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = {
+    startVelocity: 30,
+    spread: 360,
+    ticks: 60,
+    zIndex: 9999,
+  };
 
   function randomInRange(min, max) {
     return Math.random() * (max - min) + min;
   }
-  var interval = setInterval(function () {
-    var timeLeft = animationEnd - Date.now();
+
+  const interval = setInterval(() => {
+    const timeLeft = animationEnd - Date.now();
     if (timeLeft <= 0) {
       return clearInterval(interval);
     }
-    var particleCount = 50 * (timeLeft / duration);
-    // since particles fall down, start a bit higher than random
+    const particleCount = 50 * (timeLeft / duration);
     confetti({
       ...defaults,
       particleCount,
@@ -105,38 +110,44 @@ function Congratulation() {
     });
   }, 250);
 }
-function Header({ choice, onChangez }) {
-  //congrates script below
-  useEffect(() => {
-    const func = async () => {
-      const script = document.createElement("script");
-      script.src =
-        "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
-      script.async = true;
-      document.body.appendChild(script);
-    };
-    func();
-  }, []);
 
+function Header({ choice, onChangez }) {
   const navigate = useNavigate();
+
   const handlecategory = (Categoryz) => {
     onChangez(Categoryz);
     navigate(Categoryz);
   };
 
+  // Optional: Load confetti script (but since you're already importing from npm, this might not be needed)
+  // Keeping it in case you're deploying to a context where dynamic loading is needed
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src =
+      "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   return (
-    <div className=" bg-gradient-to-b from-[#327573] to-[#868acf] p-6  rounded-b-3xl text-center border-4 shadow-lg">
-      <h1 className="font-bold text-[#213547]">
-        WELCOME TO THE{" "}
+    <header className="bg-gradient-to-b from-[#327573] to-[#868acf] p-4 sm:p-6 md:p-8 rounded-b-3xl text-center border-4 shadow-lg">
+      <h1 className="font-bold text-[#213547] text-xl sm:text-2xl md:text-3xl lg:text-4xl">
+        WELCOME TO
+        <br className="sm:hidden" />
         <span
-          className="bg-[rgb(219,112,147)] p-[10px] rounded-[10px] font-extrabold hover:text-white"
+          className="inline-block mx-auto sm:ml-2 bg-[rgb(219,112,147)] px-4 py-2 rounded-3xl font-extrabold hover:text-white cursor-pointer transition duration-300"
           onMouseEnter={() => Congratulation()}
+          onClick={() => Congratulation()}
         >
           MF KITCHEN
         </span>
       </h1>
-      <Welcome choice={choice} onChange={handlecategory} />
-    </div>
+
+      {/* Responsive Welcome Component Container */}
+      <div className="mt-4">
+        <Welcome choice={choice} onChange={handlecategory} />
+      </div>
+    </header>
   );
 }
 

@@ -49,35 +49,43 @@ function Welcome({ choice, onChange }) {
   // };
 
   return (
-    <>
-      <h2 className="text-left text-2xl font-semibold mt-2 text-[#213547]">
+    <section>
+      <h2 className="text-left text-2xl sm:text-3xl font-semibold mt-2 text-[#213547]">
         Choose your Category
       </h2>
-      <div className="flex justify-between font-bold text-xl">
+
+      <div
+        className="
+        flex flex-wrap gap-3 sm:gap-5 mt-3
+        font-bold text-lg sm:text-xl justify-evenly
+      "
+      >
         {["Chicken", "Beef", "Lamb", "Vegetarian"].map((ch) => (
           <label
-            className={`flex items-center my-2 mx-0 cursor-pointer uppercase tracking-wide hover:text-white hover:scale-105 transition-all duration-700
-              ${
-                choice === ch
-                  ? "font-bold text-pink-200"
-                  : "font-black text-[#213547]"
-              }
-              `}
             key={ch}
+            className={`
+            flex items-center cursor-pointer uppercase tracking-wide
+            hover:text-white hover:scale-105 transition-all duration-700
+            ${
+              choice === ch
+                ? "font-bold text-pink-200"
+                : "font-black text-[#213547]"
+            }
+          `}
           >
             <input
               type="radio"
               name="mealType"
               value={ch}
               checked={choice === ch}
-              onChange={(e) => onChange(e.target.value)} // Update the choice state
-              className="mr-[10px] w-[18px] h-[18px] cursor-pointer accent-[#1d1d1e]"
+              onChange={(e) => onChange(e.target.value)}
+              className="mr-2 w-[18px] h-[18px] cursor-pointer accent-[#1d1d1e]"
             />
             {ch}
           </label>
         ))}
       </div>
-    </>
+    </section>
   );
 }
 
