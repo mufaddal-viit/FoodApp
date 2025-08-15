@@ -1,48 +1,20 @@
 import { useEffect, useState } from "react";
-import "./SearchIngridents.css";
 import RecipeCard from "./RecipeCard";
-import "./RecipeCard.css"; // Optional CSS file for styling
 
-function DisplayRecipeCard({ Recipes }) {
-  const [thumbnails, setThumbnails] = useState([]);
-
+function DisplayRecipeCard({ recipes }) {
   useEffect(() => {
-    const fetchThumbnails = async () => {
-      const results = await Promise.all(
-        Recipes.map(async (mealid) => {
-          const response = await fetch(
-            `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealid}`
-          );
-          const data = await response.json();
-          return data.meals[0];
-        })
-      );
-      setThumbnails(results);
-    };
-
-    if (Recipes.length > 0) {
-      fetchThumbnails();
-    }
-  }, [Recipes]);
-
-  useEffect(() => {
-    if (thumbnails.length > 0) {
+    if (recipes.length > 0) {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [thumbnails]);
+  }, [recipes]);
+
   return (
-    <div>
-      <h4>Found Recipe:</h4>
-      {thumbnails.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            margin: "15px",
-          }}
-        >
-          {/* <img src={item.thumb} alt={item.name} width={150} />
-            <p>{item.name}</p> */}
-          <RecipeCard recipe={item} />
+    <div className="mt-6 w-full">
+      <h4 className="text-xl font-semibold mb-4 text-white">Found Recipes:</h4>
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> */}
+      {recipes.map((item) => (
+        <div className="space-y-3">
+          <RecipeCard key={item.idMeal} recipe={item} />
         </div>
       ))}
     </div>
@@ -50,96 +22,140 @@ function DisplayRecipeCard({ Recipes }) {
 }
 
 export default function SearchIngridents() {
-  const [inputs, setInputs] = useState([]);
-  const [collectedRecipes, setCollectedRecipes] = useState([]);
+  const [ingredients, setIngredients] = useState([]);
+  const [recipes, setRecipes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (formdata) => {
-    const name = formdata.get("ingredient");
-    if (name !== "") {
-      if (inputs.includes(name)) {
-        alert(`${name} already present`);
-        return;
-      }
-      setInputs((prev) => [...prev, name]);
+  const handleAddIngredient = (formData) => {
+    const name = formData.get("ingredient")?.trim();
+    if (!name) return;
+
+    if (ingredients.includes(name.toLowerCase())) {
+      alert(`${name} is already added.`);
+      return;
     }
+
+    setIngredients((prev) => [...prev, name.toLowerCase()]);
   };
-  const handleSearchRecipe = async () => {
-    // alert("Searching Recipes");
-    const newCollect = [];
-    setCollectedRecipes([]);
-    for (const ingredient of inputs) {
-      try {
-        const response = await fetch(
+
+  const handleSearchRecipes = async () => {
+    setRecipes([]);
+    setLoading(true);
+    setError("");
+
+    try {
+      const collectedIds = new Set();
+      const detailedRecipes = [];
+
+      for (const ingredient of ingredients) {
+        const res = await fetch(
           `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`
         );
-        if (!response.ok) {
-          throw new Error(
-            `API error: ${response.status} ${response.statusText}`
-          );
+        const data = await res.json();
+
+        if (data?.meals) {
+          for (const meal of data.meals.slice(0, 3)) {
+            if (!collectedIds.has(meal.idMeal)) {
+              collectedIds.add(meal.idMeal);
+              const detailRes = await fetch(
+                `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`
+              );
+              const detailData = await detailRes.json();
+              if (detailData?.meals?.[0]) {
+                detailedRecipes.push(detailData.meals[0]);
+              }
+            }
+          }
         }
-        const data = await response.json();
-        if (data.meals) {
-          // alert("found")
-          const mealIds = data.meals.slice(0, 3).map((meal) => meal.idMeal);
-          newCollect.push(...mealIds);
-        }
-      } catch (error) {
-        console.error(`Error fetching data for ${ingredient}:`, error);
       }
+
+      if (detailedRecipes.length === 0) {
+        setError("No recipes found for the selected ingredients.");
+      } else {
+        setRecipes(detailedRecipes);
+      }
+    } catch (err) {
+      setError("An error occurred while fetching recipes.");
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-    setCollectedRecipes(newCollect);
-    console.log("Collected Recipe IDs:", newCollect);
   };
+
   const handleReset = () => {
-    setInputs([]);
-    setCollectedRecipes([]);
+    setIngredients([]);
+    setRecipes([]);
+    setError("");
   };
-  const [isopen, setIsopen] = useState(true);
-  const handleIsOpen = () => {
-    setIsopen((prev) => !prev);
-  };
+
   return (
-    <>
-      {/* <div //div to toggle searchbar show
-        onClick={handleIsOpen}
-        className=" mt-3 cursor-pointer text-3xl inline-block"
+    <div className="w-full sm:max-w-[400px] lg:max-w-[350px] bg-gradient-to-b from-[#327573] to-[#868acf] text-white p-5 rounded-xl shadow-xl">
+      <header className="mb-6">
+        <h3 className="text-2xl font-bold text-center text-[#213547]">
+          Search by Ingredients
+        </h3>
+      </header>
+
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          handleAddIngredient(formData);
+          e.target.reset();
+        }}
+        className="space-y-4"
       >
-        <h3>Search Recipes with Ingredients</h3>
-      </div> */}
-      {/*className={`container  ${isopen ? "opacity-100" : "opacity-0"}`} */}
-      <div className="container">
-        <header>
-          <h3>Search Recipes with Ingredients</h3>
-        </header>
-        <form
-          className="add-ind-form"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            handleSubmit(formData);
-            e.target.reset();
-          }}
-        >
-          <input type="text" placeholder="Oregano" name="ingredient" />
-          <div className="button-group">
-            <button type="submit">Add Ingredient</button>
-            <button type="button" onClick={handleReset}>
-              Reset
-            </button>
-          </div>
-          <ul>
-            {inputs.map((item, index) => (
-              <li key={index}>{item}</li>
+        <input
+          type="text"
+          name="ingredient"
+          placeholder="e.g. Oregano"
+          className="w-full px-4 py-2 text-black rounded-md shadow focus:outline-none focus:ring-2 focus:ring-teal-400"
+        />
+
+        <div className="flex gap-3">
+          <button
+            type="submit"
+            className="flex-1 border-1 border-black hover:bg-teal-600 px-4 py-2 rounded-md font-semibold"
+          >
+            Add
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="flex-1 border-1 border-black hover:bg-red-500/25 px-4 py-2 rounded-md font-semibold"
+          >
+            Reset
+          </button>
+        </div>
+      </form>
+
+      {ingredients.length > 0 && (
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold">Selected Ingredients:</h4>
+          <ul className="list-disc pl-5 mt-2  space-y-1">
+            {ingredients.map((item, idx) => (
+              <li key={idx}>{item}</li>
             ))}
           </ul>
-          {inputs.length > 2 && (
-            <button onClick={handleSearchRecipe}>Search Recipes</button>
-          )}
-        </form>
-        {collectedRecipes.length > 0 && (
-          <DisplayRecipeCard Recipes={collectedRecipes} />
-        )}
-      </div>
-    </>
+        </div>
+      )}
+
+      {ingredients.length >= 2 && (
+        <button
+          onClick={handleSearchRecipes}
+          disabled={loading}
+          className="mt-6 w-full border-1 border-black hover:bg-teal-600 px-4 py-2 rounded-md font-semibold disabled:opacity-50"
+        >
+          {loading ? "Searching..." : "Search Recipes"}
+        </button>
+      )}
+
+      {error && <p className="text-red-300 mt-4">{error}</p>}
+
+      {!loading && recipes.length > 0 && (
+        <DisplayRecipeCard recipes={recipes} />
+      )}
+    </div>
   );
 }

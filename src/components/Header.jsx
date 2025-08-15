@@ -125,8 +125,8 @@ function Header({ choice, onChangez }) {
   };
 
   return (
-    <div className=" bg-[rgb(137,157,216)] p-[25px] rounded-[10px] text-center border-4">
-      <h1>
+    <div className=" bg-gradient-to-b from-[#327573] to-[#868acf] p-6  rounded-b-3xl text-center border-4 shadow-lg">
+      <h1 className="font-bold text-[#213547]">
         WELCOME TO THE{" "}
         <span
           className="bg-[rgb(219,112,147)] p-[10px] rounded-[10px] font-extrabold hover:text-white"

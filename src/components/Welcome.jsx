@@ -50,11 +50,13 @@ function Welcome({ choice, onChange }) {
 
   return (
     <>
-      <h2 className="text-left text-2xl">Choose your Category</h2>
-      <div className="flex justify-between font-bold">
+      <h2 className="text-left text-2xl font-semibold mt-2 text-[#213547]">
+        Choose your Category
+      </h2>
+      <div className="flex justify-between font-bold text-xl">
         {["Chicken", "Beef", "Lamb", "Vegetarian"].map((ch) => (
           <label
-            className={`flex items-center my-2 mx-0 cursor-pointer uppercase tracking-wide
+            className={`flex items-center my-2 mx-0 cursor-pointer uppercase tracking-wide hover:text-white hover:scale-105 transition-all duration-700
               ${
                 choice === ch
                   ? "font-bold text-pink-200"

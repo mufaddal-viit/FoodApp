@@ -3,7 +3,7 @@ import { useRecipes } from "../Context/RecipeContext.jsx";
 import RecipeCard from "./RecipeCard.jsx";
 import "./RecipeCard.css";
 import SearchIngridents from "./SearchIngridents.jsx";
-import "./Home.css";
+// import "./Home.css";
 
 const gifs = [
   "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmxxOTI2ZG81ZGs5aWJrZzVqZTNtZDJ4eWhjdnlhcXNjNGQ1eDQ0YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xTiQymjYza10NhOFDa/giphy.gif",
@@ -18,21 +18,21 @@ function Home() {
   const { recipes, setRecipes } = useRecipes();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [randomGifIndex, setRandomGifIndex] = useState(null); // State to store random GIF index
-  //scroll to top
+  const [randomGifIndex, setRandomGifIndex] = useState(null);
+
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Change GIF when category changes
   useEffect(() => {
     setRandomGifIndex(Math.floor(Math.random() * gifs.length));
-  }, []); // Depend on category to change GIF on category change
+  }, []);
+
   useEffect(() => {
     const allowedCategories = ["Chicken", "Beef", "Lamb", "Vegetarian"];
     let isCancelled = false;
 
-    if (recipes.length >= 10) return; // Already loaded
+    if (recipes.length >= 10) return;
 
     const fetchRecipes = async () => {
       setLoading(true);
@@ -50,7 +50,7 @@ function Home() {
               const isDuplicate = prev.some((r) => r.idMeal === meal.idMeal);
               if (!isDuplicate && prev.length < 10) {
                 if (!firstRecipeAdded) {
-                  setLoading(false); // ✅ turn off loading after 1st recipe
+                  setLoading(false);
                   firstRecipeAdded = true;
                 }
                 return [...prev, meal];
@@ -61,7 +61,7 @@ function Home() {
         }
       } catch (err) {
         if (!isCancelled) setError(err.message || "Something went wrong");
-        setLoading(false); // make sure we hide loading even on error
+        setLoading(false);
       }
     };
 
@@ -70,35 +70,34 @@ function Home() {
     return () => {
       isCancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div className=" flex gap-2 m-1 ">
-      {/* <div className="sidebar">
-        <SearchIngridents />
-      </div> */}
-      <div className="flex flex-col flex-1">
-        {loading && (
-          <div className="spinner-container flex flex-col items-center mx-[10px]">
-            {randomGifIndex !== null && (
-              <img
-                className="spinner-gif"
-                src={gifs[randomGifIndex]}
-                alt="Cooking..."
-              />
-            )}
-            <div className="spinner-text">🍳 Cooking up delicious...</div>
+    <div className="flex flex-col gap-4">
+      {loading && (
+        <div className="flex flex-col items-center justify-center gap-2">
+          {randomGifIndex !== null && (
+            <img
+              className="w-48 h-48 object-contain"
+              src={gifs[randomGifIndex]}
+              alt="Cooking..."
+            />
+          )}
+          <div className="text-lg font-semibold">
+            🍳 Cooking up delicious...
           </div>
-        )}
-        {error && <p>Error: {error}</p>}
-        <div className="recipe-grid ">
-          {recipes.map((recipe) => (
-            <RecipeCard key={recipe.idMeal} recipe={recipe} />
-          ))}
         </div>
+      )}
+
+      {error && <p className="text-red-600 font-medium">Error: {error}</p>}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+        {recipes.map((recipe) => (
+          <RecipeCard key={recipe.idMeal} recipe={recipe} />
+        ))}
       </div>
     </div>
   );
 }
+
 export default Home;

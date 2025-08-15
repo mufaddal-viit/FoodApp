@@ -11,7 +11,7 @@ export default function Footer({ onchangecat }) {
   const cat = ["/", "Chicken", "Beef", "Lamb", "Vegetarian"];
 
   return (
-    <div className="flex justify-around bg-[rgb(137,157,216)] p-[20px] rounded-[10px] text-center border-4">
+    <div className="flex  justify-around bg-gradient-to-b from-[#327573] to-[#868acf]  p-10 rounded-[10px] text-xl text-center border-4">
       {cat.map((item) =>
         item === "/" ? (
           <p key={item} className="link-hover" onClick={() => handleClick("/")}>
