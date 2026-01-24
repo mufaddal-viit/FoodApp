@@ -75,7 +75,7 @@ export default Header;
 // Header.jsx
 import Welcome from "../components/Welcome";
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import confetti from "canvas-confetti";
 
 function Congratulation() {
@@ -111,12 +111,12 @@ function Congratulation() {
   }, 250);
 }
 
-function Header({ choice, onChangez }) {
+function Header() {
   const navigate = useNavigate();
+  const { category } = useParams();
 
-  const handlecategory = (Categoryz) => {
-    onChangez(Categoryz);
-    navigate(Categoryz);
+  const handlecategory = (nextCategory) => {
+    navigate(`/category/${nextCategory}`);
   };
 
   // Optional: Load confetti script (but since you're already importing from npm, this might not be needed)
@@ -145,7 +145,7 @@ function Header({ choice, onChangez }) {
 
       {/* Responsive Welcome Component Container */}
       <div className="mt-4">
-        <Welcome choice={choice} onChange={handlecategory} />
+        <Welcome choice={category} onChange={handlecategory} />
       </div>
     </header>
   );

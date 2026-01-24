@@ -1,14 +1,15 @@
 import { useNavigate } from "react-router";
 
-export default function Footer({ onchangecat }) {
+const links = [
+  { label: "Home", path: "/" },
+  { label: "Chicken", path: "/category/Chicken" },
+  { label: "Beef", path: "/category/Beef" },
+  { label: "Lamb", path: "/category/Lamb" },
+  { label: "Vegetarian", path: "/category/Vegetarian" },
+];
+
+export default function Footer() {
   const navigate = useNavigate();
-
-  const handleClick = (category) => {
-    onchangecat(category);
-    navigate(`/${category}`);
-  };
-
-  const cat = ["/", "Chicken", "Beef", "Lamb", "Vegetarian"];
 
   return (
     <div
@@ -20,10 +21,10 @@ export default function Footer({ onchangecat }) {
         text-center border-4 gap-4 sm:gap-0
       "
     >
-      {cat.map((item) => (
+      {links.map((item) => (
         <p
-          key={item}
-          onClick={() => handleClick(item === "/" ? "/" : item)}
+          key={item.label}
+          onClick={() => navigate(item.path)}
           className="
             text-lg sm:text-xl font-extrabold 
             text-[#213547] tracking-[1px] 
@@ -31,7 +32,7 @@ export default function Footer({ onchangecat }) {
             hover:-translate-y-1 hover:text-white cursor-pointer
           "
         >
-          {item === "/" ? "Home" : item}
+          {item.label}
         </p>
       ))}
     </div>

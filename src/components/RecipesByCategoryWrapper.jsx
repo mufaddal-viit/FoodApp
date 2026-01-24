@@ -2,19 +2,10 @@ import RecipesByCategory from "./RecipeByCategory";
 import { useParams } from "react-router";
 
 
-function RecipesByCategoryWrapper({ category }) {
-  const { backtopage } = useParams();
+function RecipesByCategoryWrapper() {
+  const { category } = useParams();
 
-  // Fallback logic: if backtopage is undefined, null, or "null", use prop category
-  const resolvedCategory = !backtopage || backtopage === "null" ? category : backtopage;
-
-  // console.log(resolvedCategory);
-
-  return (
-    <>
-      <RecipesByCategory category={resolvedCategory} />
-    </>
-  );
+  return <RecipesByCategory category={category} />;
 }
 
 export default RecipesByCategoryWrapper;
