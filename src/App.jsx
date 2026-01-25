@@ -20,6 +20,7 @@ function App() {
               </Suspense>
             }
           />
+
           <Route path="category/:category" element={<RecipesByCategoryWrapper />} />
           <Route path="*" element={<div className="p-4">Page not found</div>} />
         </Route>

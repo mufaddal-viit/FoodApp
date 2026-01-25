@@ -1,56 +1,44 @@
 // Header.jsx
 import Welcome from "../components/Welcome";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import confetti from "canvas-confetti";
 import SearchIngridents from "../components/SearchIngridents.jsx";
-function Congratulation() {
-  const duration = 5 * 1000;
-  const animationEnd = Date.now() + duration;
-  const defaults = {
-    startVelocity: 30,
-    spread: 360,
-    ticks: 60,
-    zIndex: 9999,
-  };
-
-  function randomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-  }
-
-  const interval = setInterval(() => {
-    const timeLeft = animationEnd - Date.now();
-    if (timeLeft <= 0) {
-      return clearInterval(interval);
-    }
-    const particleCount = 50 * (timeLeft / duration);
-    confetti({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
-    });
-    confetti({
-      ...defaults,
-      particleCount,
-      origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
-    });
-  }, 250);
-}
+import LoginButton from "./LoginButton.jsx";
+import Login from "./Login.jsx";
+import Signup from "./Signup.jsx";
+import { Congratulation, HEADER_BACKGROUND_IMAGE, CONFETTI_SCRIPT_URL } from "../utils.js";
 
 function Header() {
   const navigate = useNavigate();
   const { category } = useParams();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
 
   const handlecategory = (nextCategory) => {
     navigate(`/category/${nextCategory}`);
+  };
+
+  const openLogin = () => {
+    setIsSignupOpen(false);
+    setIsLoginOpen(true);
+  };
+
+  const openSignup = () => {
+    setIsLoginOpen(false);
+    setIsSignupOpen(true);
+  };
+
+  const closeAuth = () => {
+    setIsLoginOpen(false);
+    setIsSignupOpen(false);
   };
 
   // Optional: Load confetti script (but since you're already importing from npm, this might not be needed)
   // Keeping it in case you're deploying to a context where dynamic loading is needed
   useEffect(() => {
     const script = document.createElement("script");
-    script.src =
-      "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
+    script.src = CONFETTI_SCRIPT_URL;
+      ;
     script.async = true;
     document.body.appendChild(script);
   }, []);
@@ -60,11 +48,14 @@ function Header() {
       className="relative bg-cover bg-center bg-no-repeat rounded-b-3xl
                  min-h-[100svh] md:min-h-[90vh] flex items-start md:items-center justify-center py-5 sm:py-3"
       style={{
-        backgroundImage: `url('https://images.pexels.com/photos/3851070/pexels-photo-3851070.jpeg')`,
+        backgroundImage: `url('${HEADER_BACKGROUND_IMAGE}')`,
       }}
     >
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/60"></div>
+      <LoginButton onOpen={openLogin} />
+      <Login isOpen={isLoginOpen} onClose={closeAuth} onSwitchToSignup={openSignup} />
+      <Signup isOpen={isSignupOpen} onClose={closeAuth} onSwitchToLogin={openLogin} />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
@@ -85,7 +76,7 @@ function Header() {
           </button>
         </h1>
 
-        <p className="mt-2 sm:mt-1 text-lg sm:text-2xl md:text-3xl opacity-90 max-w-3xl mx-auto mb-2">
+        <p className="mt-2 sm:mt-1 text-lg sm:text-xl md:text-xl opacity-90 max-w-3xl mx-auto mb-2">
           Discover delicious recipes, tips, and culinary inspiration
         </p>
 

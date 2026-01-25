@@ -1,3 +1,43 @@
+import confetti from "canvas-confetti";
+
+export const HEADER_BACKGROUND_IMAGE =
+  "https://images.pexels.com/photos/3851070/pexels-photo-3851070.jpeg";
+
+export const CONFETTI_SCRIPT_URL ="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"
+
+export const FAVORITES_KEY = "favoriteRecipeIds";
+
+export const getFavoriteIds = () => {
+  if (typeof window === "undefined") return [];
+  try {
+    const stored = window.localStorage.getItem(FAVORITES_KEY);
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+export const setFavoriteIds = (ids) => {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids));
+};
+
+export const toggleFavoriteId = (id, shouldFavorite) => {
+  if (!id) return getFavoriteIds();
+  const key = String(id);
+  const ids = new Set(getFavoriteIds());
+  if (shouldFavorite) {
+    ids.add(key);
+  } else {
+    ids.delete(key);
+  }
+  const next = Array.from(ids);
+  setFavoriteIds(next);
+  return next;
+};
+
 export async function fetchRecipesByIngredients(
   ingredients,
   maxPerIngredient = 3
@@ -76,4 +116,37 @@ export async function fetchRandomRecipes({
   }
 
   return collected;
+}
+
+export function Congratulation() {
+  const duration = 5 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = {
+    startVelocity: 30,
+    spread: 360,
+    ticks: 60,
+    zIndex: 9999,
+  };
+
+  function randomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  const interval = setInterval(() => {
+    const timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) {
+      return clearInterval(interval);
+    }
+    const particleCount = 50 * (timeLeft / duration);
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+    });
+    confetti({
+      ...defaults,
+      particleCount,
+      origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+    });
+  }, 250);
 }

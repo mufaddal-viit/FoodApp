@@ -1,6 +1,23 @@
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
+import Favourite from "./Favourite.jsx";
+import { getFavoriteIds, toggleFavoriteId } from "../utils.js";
 
 function RecipeCard({ recipe }) {
+  const recipeId = recipe?.idMeal ? String(recipe.idMeal) : "";
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  useEffect(() => {
+    if (!recipeId) return;
+    setIsFavorite(getFavoriteIds().includes(recipeId));
+  }, [recipeId]);
+
+  const handleToggleFavorite = (next) => {
+    if (!recipeId) return;
+    setIsFavorite(next);
+    toggleFavoriteId(recipeId, next);
+  };
+
   return (
     <Link
       to={`/recipe/${recipe.idMeal}`}
@@ -15,6 +32,13 @@ function RecipeCard({ recipe }) {
           border border-gray-100
         "
       >
+        <div className="absolute top-4 right-4 z-10">
+          <Favourite
+            isFavorite={isFavorite}
+            onToggle={handleToggleFavorite}
+            className="bg-white/90"
+          />
+        </div>
         {/* Image */}
         <div className="aspect-w-16 aspect-h-9 overflow-hidden">
           <img
