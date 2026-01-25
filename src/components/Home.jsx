@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRecipes } from "../Context/RecipeContext.jsx";
+import { fetchRandomRecipes } from "../utils.js";
 import RecipeCard from "./RecipeCard.jsx";
 import "./RecipeCard.css";
 import SearchIngridents from "./SearchIngridents.jsx";
@@ -20,9 +21,9 @@ function Home() {
   const [loading, setLoading] = useState(false);
   const [randomGifIndex, setRandomGifIndex] = useState(null);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, []);
 
   useEffect(() => {
     setRandomGifIndex(Math.floor(Math.random() * gifs.length));
@@ -37,31 +38,36 @@ function Home() {
     const fetchRecipes = async () => {
       setLoading(true);
       let firstRecipeAdded = false;
-      try {
-        while (!isCancelled && recipes.length < 10) {
-          const response = await fetch(
-            "https://www.themealdb.com/api/json/v1/1/random.php"
-          );
-          const data = await response.json();
-          const meal = data.meals?.[0];
+      const existingIds = recipes.map((recipe) => recipe.idMeal);
+      const remaining = Math.max(0, 10 - existingIds.length);
 
-          if (meal && allowedCategories.includes(meal.strCategory)) {
+      try {
+        await fetchRandomRecipes({
+          allowedCategories,
+          limit: remaining,
+          existingIds,
+          shouldCancel: () => isCancelled,
+          onRecipe: (meal) => {
             setRecipes((prev) => {
               const isDuplicate = prev.some((r) => r.idMeal === meal.idMeal);
               if (!isDuplicate && prev.length < 10) {
-                if (!firstRecipeAdded) {
-                  setLoading(false);
-                  firstRecipeAdded = true;
-                }
                 return [...prev, meal];
               }
               return prev;
             });
-          }
-        }
+
+            if (!firstRecipeAdded) {
+              setLoading(false);
+              firstRecipeAdded = true;
+            }
+          },
+        });
       } catch (err) {
         if (!isCancelled) setError(err.message || "Something went wrong");
-        setLoading(false);
+      } finally {
+        if (!isCancelled && !firstRecipeAdded) {
+          setLoading(false);
+        }
       }
     };
 

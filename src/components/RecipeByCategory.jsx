@@ -16,9 +16,9 @@ function RecipesByCategory({ category }) {
   const [loading, setLoading] = useState(false);
   const [randomGifIndex, setRandomGifIndex] = useState(null);
 
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
+  // useEffect(() => {
+  //   window.scrollTo({ top: 0, behavior: "smooth" });
+  // }, []);
 
   useEffect(() => {
     setRandomGifIndex(Math.floor(Math.random() * gifs.length));

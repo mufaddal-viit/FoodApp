@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 const links = [
   { label: "Home", path: "/" },
@@ -10,31 +10,53 @@ const links = [
 
 export default function Footer() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   return (
-    <div
-      className="
-        flex flex-col sm:flex-row 
-        sm:justify-around items-center 
-        bg-gradient-to-b from-[#327573] to-[#868acf]  
-        p-6 sm:p-10 rounded-[10px] 
-        text-center border-4 gap-4 sm:gap-0
-      "
+    <footer
+      className="relative bg-cover bg-center bg-no-repeat mt-3"
+      style={{
+        backgroundImage: `url('https://images.pexels.com/photos/3851070/pexels-photo-3851070.jpeg')`,
+      }}
     >
-      {links.map((item) => (
-        <p
-          key={item.label}
-          onClick={() => navigate(item.path)}
-          className="
-            text-lg sm:text-xl font-extrabold 
-            text-[#213547] tracking-[1px] 
-            transition-all duration-200
-            hover:-translate-y-1 hover:text-white cursor-pointer
-          "
-        >
-          {item.label}
+      {/* Dark overlay to match header exactly */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/70 to-black/60"></div>
+
+      {/* Content - mirrored structure from Header */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-2 text-center text-white">
+        <p className="mt-6 sm:mt-8 text-lg sm:text-2xl md:text-3xl opacity-90 max-w-3xl mx-auto">
+          Thank you for visiting :)
         </p>
-      ))}
-    </div>
+
+        {/* Navigation links - styled like category cards but horizontal */}
+        <nav className="mt-12 sm:mt-16">
+          <div className="flex flex-wrap justify-center gap-6 sm:gap-10 md:gap-14">
+            {links.map((link) => {
+              const isActive = location.pathname === link.path;
+              return (
+                <button
+                  key={link.label}
+                  onClick={() => navigate(link.path)}
+                  className={`
+                    px-6 sm:px-8 py-4 rounded-3xl text-xl sm:text-2xl font-extrabold uppercase tracking-wider
+                    bg-white/20 backdrop-blur-md border-2 border-white/30
+                    transition-all duration-500 ease-out
+                    hover:bg-white/30 hover:scale-110 hover:shadow-2xl
+                    ${isActive ? "bg-white/40 border-pink-300/60 text-pink-200 scale-110 shadow-2xl" : ""}
+                  `}
+                >
+                  {link.label}
+                </button>
+              );
+            })}
+          </div>
+        </nav>
+
+        {/* Footer note */}
+        <p className="mt-16 text-base sm:text-lg opacity-80">
+          © 2026 MF Kitchen • Crafted with ❤️
+        </p>
+      </div>
+    </footer>
   );
 }

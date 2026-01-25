@@ -1,136 +1,191 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router";
-import RecipesByCategory from "./RecipeByCategory";
+import { useParams, useNavigate } from "react-router";
+import { fetchRecipeById } from "../utils.js";
 
-function RecipeDetail() {
+export default function RecipeDetail() {
   const { mealid } = useParams();
   const [recipedata, setRecipedata] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch(
-          `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${mealid}`
-        );
-        const { meals } = await res.json();
-        setRecipedata(meals[0]);
+        setLoading(true);
+        const recipe = await fetchRecipeById(mealid);
+        setRecipedata(recipe);
       } catch (err) {
         console.error("Error fetching recipe:", err);
+      } finally {
+        setLoading(false);
       }
     })();
   }, [mealid]);
 
-  useEffect(
-    () => window.scrollTo({ top: 0, behavior: "smooth" }),
-    [recipedata]
-  );
+  useEffect(() => {
+    if (recipedata) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [recipedata]);
 
   const getIngredients = () => {
+    if (!recipedata) return [];
     return Array.from({ length: 20 }, (_, i) => i + 1)
       .map((i) => {
-        const ing = recipedata[`strIngredient${i}`];
-        const amt = recipedata[`strMeasure${i}`];
-        return ing?.trim() ? `${ing} – ${amt}` : null;
+        const ing = recipedata[`strIngredient${i}`]?.trim();
+        const amt = recipedata[`strMeasure${i}`]?.trim();
+        return ing ? { ingredient: ing, measure: amt } : null;
       })
       .filter(Boolean);
   };
 
-  if (!recipedata) return <p className="text-center py-10">Loading...</p>;
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-2xl font-bold text-gray-600">Loading recipe...</p>
+      </div>
+    );
+  }
+
+  if (!recipedata) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <p className="text-2xl font-bold text-red-600">Recipe not found</p>
+      </div>
+    );
+  }
+
+  const ingredients = getIngredients();
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-gray-100 min-h-screen">
-      <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-        <img
-          src={recipedata.strMealThumb}
-          alt={recipedata.strMeal}
-          className="w-full h-64 object-cover"
-        />
-        <div className="p-6">
-          <h1 className="text-3xl font-semibold text-gray-900 mb-4 text-center">
-            {recipedata.strMeal}
-          </h1>
-
-          <div className="flex flex-wrap justify-center gap-6 mb-6 text-gray-700">
-            <span className="px-3 py-1 bg-blue-100 rounded-full">
-              Category: {recipedata.strCategory}
-            </span>
-            <span className="px-3 py-1 bg-green-100 rounded-full">
-              Cuisine: {recipedata.strArea}
-            </span>
-            {recipedata.strTags && (
-              <span className="px-3 py-1 bg-pink-100 rounded-full">
-                Tags: {recipedata.strTags.split(",").join(", ")}
-              </span>
-            )}
+    <div className="min-h-screen py-12">
+      <div className="max-w-4xl mx-auto px-6 sm:px-1">
+        {/* Main Recipe Card */}
+        <div className="
+          overflow-hidden rounded-3xl bg-white shadow-2xl
+          border border-gray-100
+        ">
+          {/* Smaller, rounded image at top */}
+          <div className="relative">
+            <img
+              src={recipedata.strMealThumb}
+              alt={recipedata.strMeal}
+              className="
+                w-full h-80 sm:h-96 md:h-[500px] object-cover
+                rounded-t-3xl
+              "
+            />
+            {/* Subtle overlay for title readability if needed */}
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black/60 to-transparent rounded-t-3xl" />
           </div>
 
-          {(recipedata.strSource || recipedata.strYoutube) && (
-            <p className="text-gray-800 mb-8 leading-relaxed space-x-4 text-center">
-              {recipedata.strSource && (
-                <a
-                  href={recipedata.strSource}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
-                >
-                  Read Article here
-                </a>
+          {/* Content */}
+          <div className="p-8 sm:p-12">
+            {/* Title */}
+            <h1 className="
+              text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900
+              text-center leading-tight -mt-8 mb-3
+            ">
+              {recipedata.strMeal}
+            </h1>
+
+            {/* Meta Pills */}
+            <div className="flex flex-wrap justify-center gap-4 mb-4">
+              <span className="px-6 py-3 rounded-full bg-pink-500/20 border border-pink-300/40 font-bold text-pink-800 text-lg">
+                {recipedata.strCategory}
+              </span>
+              <span className="px-6 py-3 rounded-full bg-teal-500/20 border border-teal-300/40 font-bold text-teal-800 text-lg">
+                {recipedata.strArea} Cuisine
+              </span>
+              {recipedata.strTags && (
+                <span className="px-6 py-3 rounded-full bg-gray-200 border border-gray-300 font-bold text-gray-700 text-lg">
+                  {recipedata.strTags.split(",").join(" • ")}
+                </span>
               )}
-              {recipedata.strYoutube && (
-                <span className="ml-4">
+            </div>
+
+            {/* Source Links */}
+            {(recipedata.strSource || recipedata.strYoutube) && (
+              <div className="flex flex-wrap justify-center gap-6 mb-12">
+                {recipedata.strSource && (
+                  <a
+                    href={recipedata.strSource}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-8 py-4 rounded-2xl bg-blue-500/10 border border-blue-300/40 font-bold text-blue-700 hover:bg-blue-500/20 transition-all"
+                  >
+                    Read Full Article
+                  </a>
+                )}
+                {recipedata.strYoutube && (
                   <a
                     href={recipedata.strYoutube}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-red-600 hover:underline"
+                    className="px-8 py-4 rounded-2xl bg-red-500/10 border border-red-300/40 font-bold text-red-700 hover:bg-red-500/20 transition-all"
                   >
                     Watch on YouTube
                   </a>
-                </span>
-              )}
-            </p>
-          )}
-
-          <h2 className="text-2xl  text-gray-900 mb-4 uppercase font-bold">
-            Ingredients
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8 capitalize">
-            {getIngredients().map((ing, idx) => (
-              <div
-                key={idx}
-                className="bg-gray-200 rounded-md p-3 text-center font-medium text-gray-700"
-              >
-                {ing}
+                )}
               </div>
-            ))}
-          </div>
+            )}
 
-          <h2 className="text-2xl  text-gray-900 mb-4 uppercase font-bold">
-            Instructions
-          </h2>
-          <ol className="list-decimal list-inside space-y-2 mb-6 text-gray-800">
-            {recipedata.strInstructions
-              .split(/[\r\n.]+/)
-              .map((s) => s.trim())
-              .filter(Boolean)
-              .map((step, idx) => (
-                <li key={idx}>{step}.</li>
+            {/* Ingredients */}
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 text-center uppercase tracking-wider">
+              Ingredients
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-16">
+              {ingredients.map(({ ingredient, measure }, idx) => (
+                <div
+                  key={idx}
+                  className="
+                    flex items-center justify-between px-6 py-5 rounded-2xl
+                    bg-gradient-to-r from-pink-500/5 to-teal-500/5
+                    border border-gray-200 shadow-sm
+                    font-medium text-lg capitalize
+                  "
+                >
+                  <span className="font-bold text-gray-800">{ingredient}</span>
+                  <span className="text-pink-600 font-semibold">{measure || "-"}</span>
+                </div>
               ))}
-          </ol>
+            </div>
 
-          <div className="text-left">
-            <button
-              onClick={() => navigate(-1)}
-              className="inline-block px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-md shadow transition"
-            >
-              ← Go Back
-            </button>
+            {/* Instructions */}
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 mb-8 text-center uppercase tracking-wider">
+              Instructions
+            </h2>
+            <ol className="space-y-6 text-lg sm:text-xl text-gray-700 leading-relaxed">
+              {recipedata.strInstructions
+                .split(/\r?\n|\.\s+(?=[A-Z])/)
+                .map((step) => step.trim())
+                .filter(Boolean)
+                .map((step, idx) => (
+                  <li key={idx} className="flex gap-6">
+                    <span className="flex-shrink-0 w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center font-extrabold text-pink-700 text-xl">
+                      {idx + 1}
+                    </span>
+                    <span>{step.endsWith(".") ? step : `${step}.`}</span>
+                  </li>
+                ))}
+            </ol>
+
+            {/* Back Button */}
+            <div className="mt-16 text-center">
+              <button
+                onClick={() => navigate(-1)}
+                className="
+                  px-10 py-5 rounded-2xl bg-gradient-to-r from-pink-500 to-teal-500
+                  font-extrabold text-2xl text-white shadow-xl
+                  hover:scale-105 hover:shadow-2xl transition-all duration-300
+                "
+              >
+                ← Go Back
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
-export default RecipeDetail;

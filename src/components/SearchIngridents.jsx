@@ -1,29 +1,12 @@
-import { useEffect, useState } from "react";
-import RecipeCard from "./RecipeCard";
+import { useState } from "react";
+import { useRecipes } from "../Context/RecipeContext.jsx";
+import { fetchRecipesByIngredients } from "../utils.js";
 
-function DisplayRecipeCard({ recipes }) {
-  useEffect(() => {
-    if (recipes.length > 0) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [recipes]);
 
-  return (
-    <div className="mt-6 w-full">
-      <h4 className="text-xl font-semibold mb-4 text-white">Found Recipes:</h4>
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"> */}
-      {recipes.map((item) => (
-        <div className="space-y-3">
-          <RecipeCard key={item.idMeal} recipe={item} />
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default function SearchIngridents() {
   const [ingredients, setIngredients] = useState([]);
-  const [recipes, setRecipes] = useState([]);
+  const { setRecipes } = useRecipes();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -39,41 +22,32 @@ export default function SearchIngridents() {
     setIngredients((prev) => [...prev, name.toLowerCase()]);
   };
 
+  const scrollToMainContent = () => {
+    const target = document.getElementById("main-content");
+    if (!target) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    target.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
   const handleSearchRecipes = async () => {
     setRecipes([]);
     setLoading(true);
     setError("");
 
     try {
-      const collectedIds = new Set();
-      const detailedRecipes = [];
-
-      for (const ingredient of ingredients) {
-        const res = await fetch(
-          `https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`
-        );
-        const data = await res.json();
-
-        if (data?.meals) {
-          for (const meal of data.meals.slice(0, 3)) {
-            if (!collectedIds.has(meal.idMeal)) {
-              collectedIds.add(meal.idMeal);
-              const detailRes = await fetch(
-                `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`
-              );
-              const detailData = await detailRes.json();
-              if (detailData?.meals?.[0]) {
-                detailedRecipes.push(detailData.meals[0]);
-              }
-            }
-          }
-        }
-      }
-
+      const detailedRecipes = await fetchRecipesByIngredients(ingredients, 3);
       if (detailedRecipes.length === 0) {
         setError("No recipes found for the selected ingredients.");
       } else {
         setRecipes(detailedRecipes);
+        requestAnimationFrame(scrollToMainContent);
       }
     } catch (err) {
       setError("An error occurred while fetching recipes.");
@@ -88,175 +62,157 @@ export default function SearchIngridents() {
     setRecipes([]);
     setError("");
   };
+  const handleRemoveIngredient = (itemToRemove) => {
+    setIngredients((prev) => prev.filter((i) => i !== itemToRemove));
+    setRecipes([]); // Clear results when removing
+  };
 
   return (
     <div
-  className="
-    w-full
-    max-w-none sm:max-w-[420px] lg:max-w-[360px]
-    mx-auto
-    rounded-2xl
-    bg-gradient-to-b from-[#327573] to-[#868acf]
-    text-white
-    shadow-xl
-    border border-white/10
-    overflow-hidden
-  "
->
-  {/* Header */}
-  <header className="px-5 pt-5 pb-3">
-    <h3 className="text-xl sm:text-2xl font-bold text-center tracking-tight text-white">
-      Search by Ingredients
-    </h3>
-    <p className="mt-1 text-center text-sm text-white/80">
-      Add 2+ ingredients to find matching recipes.
-    </p>
-  </header>
-
-  {/* Body */}
-  <div className="px-5 pb-5">
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        handleAddIngredient(formData);
-        e.currentTarget.reset();
-      }}
-      className="space-y-4"
+      className="
+        w-full max-w-xl mx-auto
+        rounded-2xl
+        text-white
+        shadow-2xl
+        shadow-white-500
+      "
     >
-      <div className="space-y-2">
-        <label htmlFor="ingredient" className="text-sm font-medium text-white/90">
-          Ingredient
-        </label>
-
-        <input
-          id="ingredient"
-          type="text"
-          name="ingredient"
-          placeholder="e.g. Oregano"
-          autoComplete="off"
-          inputMode="text"
-          enterKeyHint="done"
-          minLength={2}
-          required
-          className="
-            w-full
-            rounded-xl
-            bg-white
-            px-4 py-3
-            text-base text-gray-900
-            shadow-sm
-            outline-none
-            ring-1 ring-black/10
-            focus:ring-2 focus:ring-teal-300
-          "
-        />
-      </div>
-
-      {/* Buttons: stack on very small screens, row on sm+ */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button
-          type="submit"
-          className="
-            inline-flex items-center justify-center
-            rounded-xl
-            border border-black/20
-            bg-white/10
-            px-4 py-3
-            text-base font-semibold
-            active:scale-[0.99]
-            hover:bg-white/15
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
-          "
+      <div className="px-5 sm:px-6 py-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            handleAddIngredient(formData);
+            e.currentTarget.reset();
+          }}
+          className="space-y-4"
         >
-          Add
-        </button>
+          <div>
+            <input
+              id="ingredient"
+              type="text"
+              name="ingredient"
+              placeholder="Search by Ingredients"
+              autoComplete="off"
+              inputMode="text"
+              enterKeyHint="done"
+              minLength={2}
+              required
+              className="
+                w-full
+                rounded-2xl
+                bg-white/10
+                text-white placeholder-white/60
+                px-8 py-2
+                text-base
+                border border-white/20
+                shadow-sm
+                outline-none
+                focus:ring-2 focus:ring-white focus:border-white
+              "
+            />
+          </div>
 
-        <button
-          type="button"
-          onClick={handleReset}
-          className="
-            inline-flex items-center justify-center
-            rounded-xl
-            border border-black/20
-            bg-white/10
-            px-4 py-3
-            text-base font-semibold
-            active:scale-[0.99]
-            hover:bg-red-500/20
-            focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
-          "
-        >
-          Reset
-        </button>
-      </div>
-    </form>
-
-    {/* Selected list */}
-    {ingredients.length > 0 && (
-      <div className="mt-5 rounded-xl bg-black/10 p-4">
-        <h4 className="text-base font-semibold text-white">Selected Ingredients</h4>
-
-        <ul className="mt-2 space-y-1">
-          {ingredients.map((item, idx) => (
-            <li
-              key={`${item}-${idx}`}
-              className="flex items-center justify-between gap-3 rounded-lg bg-white/10 px-3 py-2"
+          <div className="grid grid-cols-2 gap-3">
+            <button
+              type="submit"
+              className="
+                w-full inline-flex items-center justify-center
+                rounded-xl
+                border border-white/20
+                bg-white/10
+                px-4 py-3
+                text-base font-semibold
+                transition-colors duration-200
+                active:scale-[0.99]
+                hover:bg-white/65 hover:backdrop-blur-lg 
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
+              "
             >
-              <span className="text-sm sm:text-base">{item}</span>
+              Add
+            </button>
 
-              {/* Optional: remove one ingredient (mobile-friendly) */}
-              {/* <button
-                type="button"
-                onClick={() => handleRemoveIngredient(item)}
-                className="text-xs font-semibold text-white/80 hover:text-white"
-                aria-label={`Remove ${item}`}
-              >
-                Remove
-              </button> */}
-            </li>
-          ))}
-        </ul>
+            <button
+              type="button"
+              onClick={handleReset}
+              className="
+                w-full inline-flex items-center justify-center
+                rounded-xl
+                border border-white/20
+                bg-white/10
+                px-4 py-3
+                text-base font-semibold
+                transition-colors duration-200
+                active:scale-[0.99]
+                hover:bg-white/65 hover:backdrop-blur-lg 
+                focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
+              "
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+
+        {ingredients.length > 0 && (
+          <div className="mt-1">
+            <div className="mt-3 flex flex-wrap justify-start gap-2">
+              {ingredients.map((item) => (
+                <div
+                  key={item}
+                  className="
+                    flex items-center gap-2 px-3  py-1.5 rounded-full
+                    bg-white/10 border border-white/20
+                    font-medium text-sm sm:text-base capitalize
+                    max-w-full
+                  "
+                >
+                  <span className="break-words">{item}</span>
+
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveIngredient(item)}
+                    className="
+                      w-5 h-5 rounded-full bg-white/30 flex items-center justify-center
+                      hover:bg-white/50 transition-all text-xs font-bold
+                    "
+                    aria-label={`Remove ${item}`}
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {ingredients.length >= 2 && (
+          <button
+            onClick={handleSearchRecipes}
+            disabled={loading}
+            className="
+              mt-5 w-full
+              inline-flex items-center justify-center
+              rounded-xl
+              bg-white/25  border border-white/30
+              px-4 py-3
+              text-base font-semibold
+              shadow-sm
+              transition-colors duration-200
+              hover:bg-white/65 hover:backdrop-blur-lg 
+              disabled:opacity-50 disabled:cursor-not-allowed
+              focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
+            "
+          >
+            {loading ? "Searching..." : "Search Recipes"}
+          </button>
+        )}
+
+        {error && (
+          <p className="mt-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-100">
+            {error}
+          </p>
+        )}
       </div>
-    )}
-
-    {/* Search button */}
-    {ingredients.length >= 2 && (
-      <button
-        onClick={handleSearchRecipes}
-        disabled={loading}
-        className="
-          mt-5 w-full
-          inline-flex items-center justify-center
-          rounded-xl
-          bg-teal-500/90
-          px-4 py-3
-          text-base font-semibold
-          shadow-sm
-          hover:bg-teal-500
-          disabled:opacity-50 disabled:cursor-not-allowed
-          focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70
-        "
-      >
-        {loading ? "Searching..." : "Search Recipes"}
-      </button>
-    )}
-
-    {/* Error */}
-    {error && (
-      <p className="mt-4 rounded-xl bg-red-500/15 px-4 py-3 text-sm text-red-100">
-        {error}
-      </p>
-    )}
-
-    {/* Results */}
-    {!loading && recipes.length > 0 && (
-      <div className="mt-5">
-        <DisplayRecipeCard recipes={recipes} />
-      </div>
-    )}
-  </div>
-</div>
-
+    </div>
   );
 }

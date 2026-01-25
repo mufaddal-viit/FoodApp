@@ -5,14 +5,10 @@ import SearchIngridents from "./components/SearchIngridents.jsx";
 
 export default function Layout() {
   return (
-    <main className="min-h-screen w-full bg-gradient-to-r from-[#fd7272] to-[#6ae1f0] text-gray-900 dark:text-white">
+    <main className="min-h-screen w-full bg-gray-300 dark:bg-gray-900 text-gray-900 dark:text-white">
       <Header />
 
-      <div className="flex flex-col lg:flex-row gap-4 max-w-7xl mx-auto px-4 py-6">
-        <aside className="w-full lg:w-1/4">
-          <SearchIngridents />
-        </aside>
-
+      <div id="main-content" className="flex flex-col lg:flex-row gap-8 max-w-7xl mx-auto px-4 sm:px-3 lg:px-3 py-12">
         <section className="w-full lg:flex-1">
           <Outlet />
         </section>

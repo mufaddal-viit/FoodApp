@@ -47,46 +47,74 @@ function Welcome({ choice, onChange }) {
   // const handlecongrates = () => {
   //   Congratulation();
   // };
+  const categories = [
+    { name: "Chicken", emoji: "🍗" },
+    { name: "Beef", emoji: "🥩" },
+    { name: "Lamb", emoji: "🐑" },
+    { name: "Vegetarian", emoji: "🥗" },
+  ];
 
-  return (
-    <section>
-      <h2 className="text-left text-xl  sm:text-3xl font-semibold mt-2 text-[#213547]">
-        Choose your Category
+  const scrollToMainContent = () => {
+    const target = document.getElementById("main-content");
+    if (!target) return;
+
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    target.scrollIntoView({
+      behavior: prefersReducedMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  };
+
+ return (
+    <section className="text-center">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-10 md:mb-12 tracking-tight">
+        What Are You Craving?
       </h2>
 
-      <div
-        className="
-        flex flex-wrap gap-3 sm:gap-5 mt-3
-        font-bold text-lg sm:text-xl justify-evenly
-      "
-      >
-        {["Chicken", "Beef", "Lamb", "Vegetarian"].map((ch) => (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 lg:gap-12 max-w-5xl mx-auto px-4">
+        {categories.map((item) => (
           <label
-            key={ch}
-            className={`
-            flex items-center cursor-pointer uppercase tracking-wide
-            hover:text-white hover:scale-105 transition-all duration-700
-            ${
-              choice === ch
-                ? "font-bold text-pink-200"
-                : "font-black text-[#213547]"
-            }
-          `}
+            key={item.name}
+            className="cursor-pointer block"
           >
             <input
               type="radio"
               name="mealType"
-              value={ch}
-              checked={choice === ch}
-              onChange={(e) => onChange(e.target.value)}
-              className="mr-2 w-[18px] h-[18px] cursor-pointer accent-[#1d1d1e]"
+              value={item.name}
+              checked={choice === item.name}
+              onChange={(e) => {
+                onChange(e.target.value);
+                requestAnimationFrame(scrollToMainContent);
+              }}
+              className="sr-only peer"
             />
-            {ch}
+            <div
+              className={` active:scale-[0.98]
+                flex flex-col items-center justify-center gap-3 sm:gap-4
+                w-full px-4 sm:px-6 md:px-8 py-8 sm:py-9 md:py-10
+                text-white font-extrabold text-lg sm:text-xl md:text-2xl uppercase tracking-wider
+                rounded-3xl
+                bg-white/20 backdrop-blur-md border-2 border-white/30
+                transition-all duration-500 ease-out
+                hover:bg-white/30 hover:scale-105 hover:shadow-2xl
+                peer-checked:bg-white/40 peer-checked:border-pink-300/60
+                peer-checked:text-pink-200 peer-checked:scale-110 peer-checked:shadow-2xl
+              `}
+            >
+              <span className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+                {item.emoji}
+              </span>
+              <span>{item.name}</span>
+            </div>
           </label>
         ))}
       </div>
     </section>
   );
 }
+
 
 export default Welcome;
