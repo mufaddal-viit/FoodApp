@@ -1,21 +1,15 @@
 import { Link } from "react-router";
-import { useEffect, useState } from "react";
 import Favourite from "./Favourite.jsx";
-import { getFavoriteIds, toggleFavoriteId } from "../utils.js";
+import { useRecipes } from "../Context/RecipeContext.jsx";
 
 function RecipeCard({ recipe }) {
   const recipeId = recipe?.idMeal ? String(recipe.idMeal) : "";
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  useEffect(() => {
-    if (!recipeId) return;
-    setIsFavorite(getFavoriteIds().includes(recipeId));
-  }, [recipeId]);
+  const { favoriteIds, setFavorite } = useRecipes();
+  const isFavorite = recipeId ? favoriteIds.includes(recipeId) : false;
 
   const handleToggleFavorite = (next) => {
     if (!recipeId) return;
-    setIsFavorite(next);
-    toggleFavoriteId(recipeId, next);
+    setFavorite(recipeId, next);
   };
 
   return (

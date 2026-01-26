@@ -66,7 +66,7 @@ function Welcome({ choice, onChange }) {
       behavior: prefersReducedMotion ? "auto" : "smooth",
       block: "start",
     });
-  };
+  };  
 
  return (
     <section className="text-center">

@@ -30,7 +30,7 @@ export default function Favourite({
       onClick={handleClick}
       aria-pressed={active}
       className={`
-        inline-flex items-center justify-center
+        inline-flex items-center justify-center cursor-pointer hover:bg-pink-300/70 hover:text-white
         rounded-full border px-3 py-1.5 text-xs font-semibold
         transition-all duration-200
         ${active ? "border-pink-400 bg-pink-500/10 text-pink-700" : "border-gray-200 bg-white/80 text-gray-700"}

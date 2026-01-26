@@ -1,9 +1,13 @@
 import confetti from "canvas-confetti";
+import headerImage from "./assets/headerImage.jpeg";
+import loginImage from "./assets/loginImage.jpeg";
 
-export const HEADER_BACKGROUND_IMAGE =
-  "https://images.pexels.com/photos/3851070/pexels-photo-3851070.jpeg";
+export const HEADER_BACKGROUND_IMAGE = headerImage;
+export const LOGINIMAGE = loginImage;
 
-export const CONFETTI_SCRIPT_URL ="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"
+
+export const CONFETTI_SCRIPT_URL =
+  "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";
 
 export const FAVORITES_KEY = "favoriteRecipeIds";
 
@@ -13,7 +17,7 @@ export const getFavoriteIds = () => {
     const stored = window.localStorage.getItem(FAVORITES_KEY);
     if (!stored) return [];
     const parsed = JSON.parse(stored);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map((id) => String(id)) : [];
   } catch {
     return [];
   }
