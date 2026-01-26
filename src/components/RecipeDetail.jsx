@@ -39,6 +39,27 @@ export default function RecipeDetail() {
       .filter(Boolean);
   };
 
+  const getInstructionSteps = () => {
+    const raw = recipedata?.strInstructions || "";
+    const normalized = raw.replace(/\r\n/g, "\n").trim();
+    if (!normalized) return [];
+
+    const stepMarkerRegex = /(?:^|\n)\s*step\s*\d+\s*[:.-]?\s*/gi;
+    if (stepMarkerRegex.test(normalized)) {
+      return normalized
+        .split(stepMarkerRegex)
+        .map((step) => step.trim())
+        .filter(Boolean);
+    }
+
+    const paragraphs = normalized
+      .split(/\n{2,}/)
+      .map((step) => step.trim())
+      .filter(Boolean);
+
+    return paragraphs.length > 0 ? paragraphs : [normalized];
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -56,7 +77,8 @@ export default function RecipeDetail() {
   }
 
   const ingredients = getIngredients();
-
+  const instructionSteps = getInstructionSteps();
+  
   return (
     <div className="min-h-screen py-12">
       <div className="max-w-4xl mx-auto px-6 sm:px-1">
@@ -156,25 +178,21 @@ export default function RecipeDetail() {
               Instructions
             </h2>
             <ol className="space-y-6 text-lg sm:text-xl text-gray-700 leading-relaxed">
-              {recipedata.strInstructions
-                .split(/\r?\n|\.\s+(?=[A-Z])/)
-                .map((step) => step.trim())
-                .filter(Boolean)
-                .map((step, idx) => (
-                  <li key={idx} className="flex gap-6">
-                    <span className="flex-shrink-0 w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center font-extrabold text-pink-700 text-xl">
-                      {idx + 1}
-                    </span>
-                    <span>{step.endsWith(".") ? step : `${step}.`}</span>
-                  </li>
-                ))}
+              {instructionSteps.map((step, idx) => (
+                <li key={idx} className="flex gap-6">
+                  <span className="flex-shrink-0 w-12 h-12 rounded-full bg-pink-500/20 flex items-center justify-center font-extrabold text-pink-700 text-xl">
+                    {idx + 1}
+                  </span>
+                  <span>{step.endsWith(".") ? step : `${step}.`}</span>
+                </li>
+              ))}
             </ol>
 
             {/* Back Button */}
             <div className="mt-16 text-center">
               <button
                 onClick={() => navigate(-1)}
-                className="
+                className=" cursor-pointer active:scale-[0.99] 
                   px-10 py-5 rounded-2xl bg-gradient-to-r from-pink-500 to-teal-500
                   font-extrabold text-2xl text-white shadow-xl
                   hover:scale-105 hover:shadow-2xl transition-all duration-300

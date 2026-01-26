@@ -1,4 +1,5 @@
 import { useState } from "react";
+import {Heart} from "lucide-react";
 
 export default function Favourite({
   isFavorite,
@@ -29,15 +30,15 @@ export default function Favourite({
       type="button"
       onClick={handleClick}
       aria-pressed={active}
-      className={`
-        inline-flex items-center justify-center cursor-pointer hover:bg-pink-300/70 hover:text-white
-        rounded-full border px-3 py-1.5 text-xs font-semibold
+      className={` active:scale-[0.99] 
+        inline-flex items-center justify-center cursor-pointer
+        rounded-full  px-3 py-1.5 text-xs font-semibold
         transition-all duration-200
-        ${active ? "border-pink-400 bg-pink-500/10 text-pink-700" : "border-gray-200 bg-white/80 text-gray-700"}
+        
         ${className}
       `}
     >
-      {active ? "Favorited" : "Favorite"}
+      {active ? <Heart className=" fill-red-500 text-red-500 scale-110"/> : <Heart />}
     </button>
   );
 }

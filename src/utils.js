@@ -5,6 +5,15 @@ import loginImage from "./assets/loginImage.jpeg";
 export const HEADER_BACKGROUND_IMAGE = headerImage;
 export const LOGINIMAGE = loginImage;
 
+export const LOADING_GIFS = [
+  "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmxxOTI2ZG81ZGs5aWJrZzVqZTNtZDJ4eWhjdnlhcXNjNGQ1eDQ0YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/xTiQymjYza10NhOFDa/giphy.gif",
+  "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmxxOTI2ZG81ZGs5aWJrZzVqZTNtZDJ4eWhjdnlhcXNjNGQ1eDQ0YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/l0HlPZiLi4qr2bmMw/giphy.gif",
+  "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdmxxOTI2ZG81ZGs5aWJrZzVqZTNtZDJ4eWhjdnlhcXNjNGQ1eDQ0YSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/IsZ6k5d5oFxBK/giphy.gif",
+  "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGUzOHU4YTg4MDFuMDhtbmpzYXQ0b3Z2cnhrZDdyZzZoeTc5NWxkOSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/DYerUxZa9k568/giphy.gif",
+  "https://media.giphy.com/media/NnPxQx0lTujKM/giphy.gif?cid=ecf05e4790bglbv5w6zei3oacltrjmtgua1kgk4tbmtidpr5&ep=v1_gifs_search&rid=giphy.gif&ct=g",
+  "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGUzOHU4YTg4MDFuMDhtbmpzYXQ0b3Z2cnhrZDdyZzZoeTc5NWxkOSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/or3YvoqY4adAA/giphy.gif",
+];
+
 
 export const CONFETTI_SCRIPT_URL =
   "https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js";

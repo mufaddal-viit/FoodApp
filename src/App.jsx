@@ -3,8 +3,10 @@ import { Suspense, lazy } from "react";
 import Layout from "./Layout";
 import Home from "./components/Home.jsx";
 import RecipesByCategoryWrapper from "./components/RecipesByCategoryWrapper.jsx";
+import FavouriteView from "./components/FavouriteView.jsx"
 
 const RecipeDetail = lazy(() => import("./components/RecipeDetail.jsx"));
+
 
 function App() {
   return (
@@ -20,7 +22,7 @@ function App() {
               </Suspense>
             }
           />
-
+          <Route path="favourites" element={<FavouriteView />}/>
           <Route path="category/:category" element={<RecipesByCategoryWrapper />} />
           <Route path="*" element={<div className="p-4">Page not found</div>} />
         </Route>
