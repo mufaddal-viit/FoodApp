@@ -12,8 +12,11 @@ function App() {
   return (
     <BrowserRouter basename="/FoodApp">
       <Routes>
-        <Route path="/" element={<Layout />}>
+        <Route path="/" element={<Layout variant="home" />}>
           <Route index element={<Home />} />
+        </Route>
+
+        <Route element={<Layout variant="inner" />}>
           <Route
             path="recipe/:mealid"
             element={

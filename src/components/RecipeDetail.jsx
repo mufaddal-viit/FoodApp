@@ -109,13 +109,6 @@ export default function RecipeDetail() {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-          <button
-            onClick={() => navigate(-1)}
-            className="absolute top-4 left-4 p-2 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-black/60 transition"
-          >
-            <ChevronLeft size={24} />
-          </button>
-
           <div className="absolute bottom-0 left-0 right-0 p-5">
             <h1 className="text-3xl font-extrabold text-white leading-tight drop-shadow-lg">
               {recipe.strMeal}
