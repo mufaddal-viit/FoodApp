@@ -3,7 +3,6 @@ import { useRecipes } from "../Context/RecipeContext.jsx";
 import { fetchRandomRecipes } from "../utils.js";
 import LoadingRecipes from "./LoadingRecipes.jsx";
 import RecipeCard from "./RecipeCard.jsx";
-import "./RecipeCard.css";
 
 function Home() {
   const { recipes, setRecipes } = useRecipes();
@@ -69,7 +68,7 @@ function Home() {
 
       {error && <p className="text-red-600 font-medium">Error: {error}</p>}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
         {recipes.map((recipe) => (
           <RecipeCard key={recipe.idMeal} recipe={recipe} />
         ))}

@@ -4,8 +4,39 @@ import { useRecipes } from "../Context/RecipeContext.jsx";
 
 function RecipeCard({ recipe }) {
   const recipeId = recipe?.idMeal ? String(recipe.idMeal) : "";
+  const recipeLink = recipeId ? `/recipe/${recipeId}` : "/";
   const { favoriteIds, setFavorite } = useRecipes();
   const isFavorite = recipeId ? favoriteIds.includes(recipeId) : false;
+  const mealName = recipe?.strMeal || "Untitled recipe";
+  const mealImage = recipe?.strMealThumb || "";
+  const category = recipe?.strCategory || "General";
+  const origin = recipe?.strArea || "Global";
+
+  const getInstructionSteps = () => {
+    const raw = recipe?.strInstructions || "";
+    const normalized = raw.replace(/\r\n/g, "\n").trim();
+    if (!normalized) return [];
+
+    const stepMarkerRegex = /(?:^|\n)\s*step\s*\d+\s*[:.-]?\s*/gi;
+    if (stepMarkerRegex.test(normalized)) {
+      return normalized
+        .split(stepMarkerRegex)
+        .map((step) => step.trim())
+        .filter(Boolean);
+    }
+
+    const paragraphs = normalized
+      .split(/\n{2,}/)
+      .map((step) => step.trim())
+      .filter(Boolean);
+
+    return paragraphs.length > 0 ? paragraphs : [normalized];
+  };
+
+  const instructionSteps = getInstructionSteps();
+  const mealDescription =
+    instructionSteps[0] ||
+    `A ${category.toLowerCase()} recipe inspired by ${origin} flavors.`;
 
   const handleToggleFavorite = (next) => {
     if (!recipeId) return;
@@ -14,86 +45,83 @@ function RecipeCard({ recipe }) {
 
   return (
     <Link
-      to={`/recipe/${recipe.idMeal}`}
-      className="block text-inherit no-underline"
+      to={recipeLink}
+      className="group block h-full rounded-[24px] text-inherit no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500/60 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
     >
-      <div
+      <article
         className="
-          group relative overflow-hidden rounded-3xl
-          bg-white shadow-lg h-[520px]
-          transition-all duration-500 ease-out
-          hover:scale-[1.03] hover:shadow-2xl
-          border border-gray-100
+          relative isolate flex h-full flex-col overflow-hidden rounded-[24px]
+          border border-slate-200/80 bg-white
+          shadow-[0_14px_34px_-20px_rgba(15,23,42,0.6)]
+          transition-all duration-300
+          active:scale-[0.985]
+          lg:h-[520px]
+          sm:hover:-translate-y-1 sm:hover:shadow-[0_24px_45px_-24px_rgba(15,23,42,0.65)]
         "
       >
-        <div className="absolute top-4 right-4 z-10">
-          <Favourite
-            isFavorite={isFavorite}
-            onToggle={handleToggleFavorite}
-            className="bg-white/90"
-          />
+        <div className="relative aspect-[4/3] overflow-hidden">
+          {mealImage ? (
+            <img
+              src={mealImage}
+              alt={mealName}
+              className="h-full w-full object-cover transition-transform duration-500 sm:group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <div className="h-full w-full bg-gradient-to-br from-slate-200 via-slate-300 to-slate-200" />
+          )}
+
+          <div className="absolute right-3 top-3 z-10">
+            <Favourite
+              isFavorite={isFavorite}
+              onToggle={handleToggleFavorite}
+              className="h-10 w-10 bg-white/95 p-0 text-slate-700 shadow-sm ring-1 ring-white/70 backdrop-blur-sm"
+            />
+          </div>
+
+          <p className="absolute bottom-3 left-3 rounded-full bg-black/30 px-2.5 py-1 text-[11px] font-medium tracking-wide text-white/95 backdrop-blur-sm">
+            {origin} cuisine
+          </p>
         </div>
-        {/* Image */}
-        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-          <img
-            src={recipe.strMealThumb}
-            alt={recipe.strMeal}
-            className="
-              w-full h-72 object-cover
-              transition-all duration-700 ease-out
-              group-hover:scale-110
-            "
-            loading="lazy"
-          />
+
+        <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
           {/* Subtle gradient overlay on hover */}
           <div
             className="
-              absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent
-              opacity-0 group-hover:opacity-100 transition-opacity duration-500
+            pointer-events-none absolute inset-0 z-10
+              bg-gradient-to-t from-black/60 via-black/20 to-transparent
+              opacity-0 transition-opacity duration-500
+              lg:group-hover:opacity-100
+              group-active:opacity-100
             "
           />
-        </div>
-
-        {/* Details */}
-        <div className="p-6 sm:p-8">
           <h2
             className="
-              text-2xl sm:text-3xl font-extrabold text-gray-900
-              line-clamp-2 leading-tight
+              overflow-hidden text-[1.15rem] font-extrabold leading-tight text-slate-900 sm:text-xl
+              [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] border-b border-slate-100 pb-3
             "
           >
-            {recipe.strMeal}
+            {mealName}
           </h2>
 
-          <div className="mt-4 space-y-2 text-base sm:text-lg text-gray-600">
-            <p className="font-medium">
-              Category: <span className="font-bold text-pink-600">{recipe.strCategory}</span>
-            </p>
-            <p className="font-medium">
-              Origin: <span className="font-bold text-teal-600">{recipe.strArea}</span>
-            </p>
-          </div>
+          <p
+            className="
+              text-sm leading-relaxed text-slate-600
+              [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden
+            "
+          >
+            {mealDescription}
+          </p>
 
-          {/* Optional YouTube link - uncomment if you want it */}
-          {/* {recipe.strYoutube && (
-            <a
-              href={recipe.strYoutube}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="
-                mt-6 inline-block px-6 py-3 rounded-2xl
-                bg-pink-500/20 backdrop-blur-sm border border-pink-300/30
-                font-semibold text-pink-700
-                hover:bg-pink-500/40 transition-all
-              "
-            >
-              Watch Video Recipe
-            </a>
-          )} */}
+          <div className="mt-auto flex items-center justify-between border-t border-slate-100 pt-3 text-sm font-semibold text-slate-600">
+            <span>View recipe</span>
+            {/* <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-700">
+              Tap
+            </span> */}
+          </div>
         </div>
 
-        {/* Hover shine effect (optional premium touch) */}
+        {/* Glassy hover sweep (large screens) */}
         <div
           className="
             absolute inset-0 pointer-events-none
@@ -103,7 +131,7 @@ function RecipeCard({ recipe }) {
             transition-transform duration-1000
           "
         />
-      </div>
+      </article>
     </Link>
   );
 }
