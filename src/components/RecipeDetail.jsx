@@ -4,6 +4,7 @@ import { ChevronLeft, Clock, ListChecks, Utensils, Globe, Play } from "lucide-re
 import { fetchRecipeById } from "../utils.js";
 import DisplayIngredients from "./DisplayIngridents.jsx"; // renamed for correctness
 import DisplaySteps from "./DisplaySteps.jsx";
+import LiquidGlassActionButton from "./LiquidGlassActionButton.jsx";
 
 export default function RecipeDetail() {
   const { mealid } = useParams();
@@ -153,24 +154,24 @@ export default function RecipeDetail() {
           {/* Extra links */}
           <div className="flex flex-wrap gap-3 mt-10">
             {recipe.strSource && (
-              <a
+              <LiquidGlassActionButton
                 href={recipe.strSource}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center py-3 px-5 bg-slate-800 text-white rounded-xl font-medium hover:bg-slate-900 transition"
-              >
-                View Original Source
-              </a>
+                label="View Original Source"
+                Icon={Globe}
+                tone="slate"
+                fullWidth
+                className="py-3"
+              />
             )}
             {recipe.strYoutube && (
-              <a
+              <LiquidGlassActionButton
                 href={recipe.strYoutube}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 text-center py-3 px-5 bg-red-400 text-white rounded-xl font-medium hover:bg-red-700 transition flex items-center justify-center gap-2"
-              >
-                <Play size={18} /> Watch Video
-              </a>
+                label="Watch Video"
+                Icon={Play}
+                tone="youtube"
+                fullWidth
+                className="py-3"
+              />
             )}
           </div>
         </div>
@@ -180,7 +181,7 @@ export default function RecipeDetail() {
       <div className="hidden lg:block max-w-7xl mx-auto px-6 xl:px-8 pt-10">
         <button
           onClick={() => navigate(-1)}
-          className="group inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-8 transition"
+          className="group inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 mb-8 transition cursor-pointer"
         >
           <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           Back to recipes
@@ -258,25 +259,23 @@ export default function RecipeDetail() {
             {/* Action buttons */}
             <div className="flex flex-wrap gap-4">
               {recipe.strYoutube && (
-                <a
+                <LiquidGlassActionButton
                   href={recipe.strYoutube}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-red-600 text-white rounded-2xl font-semibold hover:bg-red-700 transition shadow-lg shadow-red-200/30"
-                >
-                  <Play size={20} /> Watch on YouTube
-                </a>
+                  label="Watch on YouTube"
+                  Icon={Play}
+                  tone="youtube"
+                  className="px-8 py-4"
+                />
               )}
 
               {recipe.strSource && (
-                <a
+                <LiquidGlassActionButton
                   href={recipe.strSource}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-slate-800 text-white rounded-2xl font-semibold hover:bg-slate-900 transition"
-                >
-                  Original Source
-                </a>
+                  label="Original Source"
+                  Icon={Globe}
+                  tone="slate"
+                  className="px-8 py-4"
+                />
               )}
             </div>
           </div>
