@@ -1,43 +1,53 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRecipes } from "../Context/RecipeContext.jsx";
 import { fetchRandomRecipes } from "../utils.js";
 import LoadingRecipes from "./LoadingRecipes.jsx";
+import LoadMore from "./LoadMore.jsx";
 import RecipeCard from "./RecipeCard.jsx";
+
+const ALLOWED_CATEGORIES = ["Chicken", "Beef", "Lamb", "Vegetarian"];
+const INITIAL_BATCH_SIZE = 10;
+const LOAD_MORE_BATCH_SIZE = 6;
 
 function Home() {
   const { recipes, setRecipes } = useRecipes();
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const hasFetchedInitialRef = useRef(false);
+  const isCancelledRef = useRef(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   useEffect(() => {
-    const allowedCategories = ["Chicken", "Beef", "Lamb", "Vegetarian"];
-    let isCancelled = false;
+    isCancelledRef.current = false;
+    return () => {
+      isCancelledRef.current = true;
+    };
+  }, []);
 
-    if (recipes.length >= 10) return;
-
-    const fetchRecipes = async () => {
+  const fetchRecipesBatch = useCallback(
+    async (limit) => {
+      if (loading) return;
       setLoading(true);
+      setError(null);
       let firstRecipeAdded = false;
       const existingIds = recipes.map((recipe) => recipe.idMeal);
-      const remaining = Math.max(0, 10 - existingIds.length);
 
       try {
         await fetchRandomRecipes({
-          allowedCategories,
-          limit: remaining,
+          allowedCategories: ALLOWED_CATEGORIES,
+          limit,
           existingIds,
-          shouldCancel: () => isCancelled,
+          shouldCancel: () => isCancelledRef.current,
           onRecipe: (meal) => {
+            if (isCancelledRef.current) return;
+
             setRecipes((prev) => {
               const isDuplicate = prev.some((r) => r.idMeal === meal.idMeal);
-              if (!isDuplicate && prev.length < 10) {
-                return [...prev, meal];
-              }
-              return prev;
+              if (isDuplicate) return prev;
+              return [...prev, meal];
             });
 
             if (!firstRecipeAdded) {
@@ -47,20 +57,27 @@ function Home() {
           },
         });
       } catch (err) {
-        if (!isCancelled) setError(err.message || "Something went wrong");
+        if (!isCancelledRef.current) {
+          setError(err.message || "Something went wrong");
+        }
       } finally {
-        if (!isCancelled && !firstRecipeAdded) {
+        if (!isCancelledRef.current && !firstRecipeAdded) {
           setLoading(false);
         }
       }
-    };
+    },
+    [loading, recipes, setRecipes]
+  );
 
-    fetchRecipes();
+  useEffect(() => {
+    if (hasFetchedInitialRef.current || recipes.length > 0) return;
+    hasFetchedInitialRef.current = true;
+    fetchRecipesBatch(INITIAL_BATCH_SIZE);
+  }, [fetchRecipesBatch, recipes.length]);
 
-    return () => {
-      isCancelled = true;
-    };
-  }, []);
+  const handleLoadMore = () => {
+    fetchRecipesBatch(LOAD_MORE_BATCH_SIZE);
+  };
 
   return (
     <div className="flex flex-col gap-4">
@@ -73,6 +90,8 @@ function Home() {
           <RecipeCard key={recipe.idMeal} recipe={recipe} />
         ))}
       </div>
+
+      <LoadMore onClick={handleLoadMore} loading={loading} />
     </div>
   );
 }
